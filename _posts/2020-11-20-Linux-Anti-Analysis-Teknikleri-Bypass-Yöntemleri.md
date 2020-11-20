@@ -1,16 +1,61 @@
 ---
-title: Malware Analysis - Static Analysis (Part 2)
+title: Linux Anti Analysis Teknikleri & Bypass Yöntemleri
 layout: post
 tags: [Linux,Analysis]
 author: 0x00fy
 ---
 
 
-#### Malware Analysis - Static Analysis (Part 2)
+#### Linux Anti Analysis Teknikleri & Bypass Yöntemleri
 
-Merhaba arkadaşlar **Malware Analizi** serimin ikinci part'ına hoşgeldiniz.
+Merhaba Dostlar Yeni yazıma Hoşgeldiniz ,
 
-![](https://i.hizliresim.com/0RPDnY.jpg)
+Günümüzde zararlı yazılım geliştiricileri yazdıkları zararlı yazılımın 3. Kişiler ve Malware Analist ler tarafından incelenmesini zorlaştırmak veya engelleyebilmek için **Anti Analysis** tekniklerinden yararlanırlar. Malware Analist lerin kullandığı araç ve yöntemlerden bazıları;
+
+***disassembling, debugging, patching, function hooking, virtual machine olarak isimlendirilebilir…***
+
+Bu yazımda en yaygın **Anti Analysis** tekniklerini ve bypass yöntemlerini anlatacağım. Herşeyden önce bu yazıdaki bypass yöntemlerini daha iyi anlayabilmeniz açısından [Linux Load Time Function Hijacking](https://twitter.com/0DAYanc) yazısını okumanızı tavsiye ediyorum, bu yazıda kullanacağımız bypass teknikleri **Linux Load Time Function Hijacking (via shared object injection)** methodu üzerine kuruludur. Artık Gerekli şeyleri öğrendiğinizi farzederek Anti Analysis tekniklerini ve Bypass Methodlarını Sırayla anlatmaya başlıyorum ;
+
+**1) - Anti Ptrace Tekniği**
+
+Binary analizlerde sıkça kullanılan yöntemlerden bir tanesi debugging dir. Debugger adı verilen araçlar bize herhangi bir programı en ince ayrıntısına kadar inceleme fırsatı verir. Programı disassemble etme, breakpoint koyarak programın çalışmasını istediğimiz noktada durdurma, herhangi bir anda registerların değerini görme/değiştirme, programa ait bellek alanını inceleme gibi oldukça işe yarayan özellikleri bulunur.
+
+Peki nasıl oluyorda bir programın çalışmasına bu denli müdahale edebiliyoruz derseniz, tam bu noktada process tracing konusu devreye giriyor. Bu işlem için Linux’da ptrace adlı bir sistem çağrısı bulunmakta. ( Bu sistem Çağrısının işlevine Önceki Yazımda detaylı şekilde değinmiştim )
+
+Linux ortamında debuggerlar bu sistem çağrısını kullanarak işlemi takip ederler. Bir program aynı anda yanlızca bir process tarafından trace edilebilir!
+
+Anti Ptrace Source Kodu :
+
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ptrace.h>
+
+int check_ptrace()
+{
+	if ( ptrace(PTRACE_TRACEME) == -1 )  // Program Kendini trace edememe durumu varsa
+		exit(0); // Bu durumda program kapansın
+}
+
+int main()
+{
+	check_ptrace();
+	puts("Ptrace Tespit Edilemedi , Zararli Kodlar Calisabilir..");
+	return 0;
+}
+
+
+
+```
+
+Source Kodun bu Bölümde `ptrace()` sistem çağrısının `PTRACE_TRACEME` parametresi kullanılarak Ana process 'e TRACEME sinyali gönderilir, bu sinyali alan process kendisini trace etmeye başlar. Bu sayede process herhangi bir debugger tarafından trace edilmeye çalışıldığında program otomatik olarak kendini sonlandıracaktır…
+
+
+
+
+
+
 
 Bu part içerisinde bir **Malware**'nin **Statik** analizinin nasıl yapacağını anlatacağım.
 
