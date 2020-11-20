@@ -236,7 +236,7 @@ AntiAnalysis uygulamasını derledikten sonra , **“python bypass.py ./anti-ptr
 **NOT : Çalışması için GDB kurulu olmalıdır , başka debugger kullanmak isterseniz *bypass.py 'nin 34. Satırındaki* *gdb -q* başlatıcısını değiştirmeniz yeterli olacaktır…**
 
 **Repository :**
-[](https://github.com/0x00fy/Linux-Anti-Analysis-Bypass)
+[GITHUB REPOSITORY (ANTI ANALYSIS TEKNIKLERI VE OTOMATIZE EDILMIS BYPASS UYGULAMALARI](https://github.com/0x00fy/Linux-Anti-Analysis-Bypass)
 
 
 ## THE END
