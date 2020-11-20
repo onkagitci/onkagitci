@@ -16,7 +16,8 @@ Günümüzde zararlı yazılım geliştiricileri yazdıkları zararlı yazılım
 
 Bu yazımda en yaygın **Anti Analysis** tekniklerini ve bypass yöntemlerini anlatacağım. Herşeyden önce bu yazıdaki bypass yöntemlerini daha iyi anlayabilmeniz açısından [Linux Load Time Function Hijacking](https://twitter.com/0DAYanc) yazısını okumanızı tavsiye ediyorum, bu yazıda kullanacağımız bypass teknikleri **Linux Load Time Function Hijacking (via shared object injection)** methodu üzerine kuruludur. Artık Gerekli şeyleri öğrendiğinizi farzederek Anti Analysis tekniklerini ve Bypass Methodlarını Sırayla anlatmaya başlıyorum ;
 
-**1) - Anti Ptrace Tekniği**
+
+## **1) - Anti Ptrace Tekniği**
 
 Binary analizlerde sıkça kullanılan yöntemlerden bir tanesi debugging dir. Debugger adı verilen araçlar bize herhangi bir programı en ince ayrıntısına kadar inceleme fırsatı verir. Programı disassemble etme, breakpoint koyarak programın çalışmasını istediğimiz noktada durdurma, herhangi bir anda registerların değerini görme/değiştirme, programa ait bellek alanını inceleme gibi oldukça işe yarayan özellikleri bulunur.
 
@@ -88,7 +89,8 @@ Ne yaptığımızı anlamayan arkadaşlar için ufak bir video hazırladım, izl
 
 
 
-**2) - Anti Breakpoint Tekniği**
+
+## **2) - Anti Breakpoint Tekniği**
 
 Bir program debug edilirken programın belirli noktalarına breakpoint koyarak istenilen noktalarda durmasını sağlar ve programın o anki durumunu inceleriz.
 
@@ -144,7 +146,8 @@ long exit(int request, int pid, int addr, int data)
 
 
 
-**3)- Anti Binary Modification Tekniği**
+
+## **3)- Anti Binary Modification Tekniği**
 
 Analistler inceledikleri bir programda bulunan kontrolleri aşmak adına programda bazı yerleri modifiye edip bu kontrolleri bypass edebilirler. Bu yönteme binary modification veya patching adı verilir. **Anti-patching** tekniğinin mantığı program çalışmaya başlamadan önce kodların checksum değerini hesaplayıp önceden hesaplanmış esas checksum değeri ile karşılaştırarak programın değiştirilip değiştirilmediğini bulmaya çalışmaktır.
 
@@ -189,7 +192,7 @@ void dummy()
 
 
 
-**4)- Anti Hook Tekniği**
+## **4)- Anti Hook Tekniği**
 
 Gelelim işin en trajikomik kısımına , zararlı yazılım geliştiricilerinin fonksiyonları hooklamamızı engelleyeceğini düşündüğü kod parçasına, bu yöntem bizim Fonksiyonları hijack etmemizi engellemek üzerine kuruludur,
 
@@ -233,7 +236,7 @@ AntiAnalysis uygulamasını derledikten sonra , **“python bypass.py ./anti-ptr
 **NOT : Çalışması için GDB kurulu olmalıdır , başka debugger kullanmak isterseniz *bypass.py 'nin 34. Satırındaki* *gdb -q* başlatıcısını değiştirmeniz yeterli olacaktır…**
 
 **Repository :**
-![](https://github.com/0x00fy/Linux-Anti-Analysis-Bypass)
+[](https://github.com/0x00fy/Linux-Anti-Analysis-Bypass)
 
 
 ## THE END
