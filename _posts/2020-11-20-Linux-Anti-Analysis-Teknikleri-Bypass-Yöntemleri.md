@@ -51,255 +51,193 @@ int main()
 
 Source Kodun bu Bölümde `ptrace()` sistem çağrısının `PTRACE_TRACEME` parametresi kullanılarak Ana process 'e TRACEME sinyali gönderilir, bu sinyali alan process kendisini trace etmeye başlar. Bu sayede process herhangi bir debugger tarafından trace edilmeye çalışıldığında program otomatik olarak kendini sonlandıracaktır…
 
+`if ( ptrace(PTRACE_TRACEME) == -1 )`
 
+**Anti ptrace Bypass :**
 
+Gelelim bu Anti Analysis tekniğinin bypass edilişine , bu yazıda hemen hemen bütün teknikleri aynı şekilde bypass edeceğiz. Olayımızın kilit noktası ve mantığı özetle ; **Load Time Function Hijacking** ile kilit fonksiyonları Hijack Ederek, bu teknikleri bypass etmek. Bunun için izlememiz gereken adımlar sırası ile ;
 
-
-
-
-Bu part içerisinde bir **Malware**'nin **Statik** analizinin nasıl yapacağını anlatacağım.
-
-İleride ki part içerisinde **Dinamik** analizini anlatacağım.
-
-Bu ikisini ayrı ayrı partlara bölmemin sebebi ikisininde tam olarak derinliklerine ineceğiz. Bu yüzden ikisini ayrı ayrı paylaşma gereği duydum.
-
-Önceki part içerisinden **Win 7** ve **REMnux**'u kurduğunuzu aynı zamanda **Network** ve **Snapshot** ayarlarını gerçekleştirdiğinizi varsayıp devam ediyorum.
-
-Bu yazımızda **Sanal Makine** kullanmayacağız. Çünkü **Malware**'yi çalıştırmadan inceleyeceğiz. Yalnız ileride **Dynamic Analysis** yazımda artık bir kaç **Malware** çalıştırmaya başladığımızda **Sanal Makine** kullanacağımız için gerekli olacaktır.
-
-Şimdi yavaştan yazımıza geçelim ve bir **Malware**'nin **Statik** analizinin nasıl yapacağını anlatalım.
-
-## What The F!!K is packing and obfuscating ?
-
-Bir **Malware**'nin **Statik** analizini gerçekleştirmeye başlayacağımızda bakmamız gereken ilk noktalardan biri **Pack** ve **Obfuscate** terimleridir.
-
-Hemen bu terimlere daha önce denk gelmeyen arkadaşlar için basitçe anlatayım.
-
-**Packing Nedir ?**
-
-1. Dosya sıkıştırma denilebilir basit bir şekilde.
-
-2. Sıkıştırılan dosya kendi içinde aynı zamanda bu sıkıştırmayı çözmek için bir kod bulundurur.
-
-3. Genellikle packlenmiş yani sıkıştırılmış dosyalar bu packing'i kendi içinde çözmek için anahtarlar kullanır.
-
-4. Bir **Zararlı Yazılım**'ı **Pack**'lemenin asıl amacı **Ana Kod**'u **Sıkıştırdıktan** sonra bu **Zararlı Yazılım** çalıştığında **Sıkıştırılmış**  kodu **Memory** yani **Hafıza** içerisinde çözmektir.
-
-5. Bir **Malware**'nin analizini engellemek için ve kafa karıştırmak için çokça kullanılan bir yöntemdir.
-
-Bir **Packing**'in **Routine**'ini yani **Rutin**'ini gösteren googleden bulduğum görsel :
-![](https://i.hizliresim.com/k92BdJ.png)
-
-**Obfuscating Nedir ?**
-
-1. İnsanların anlaması için zorlaştırma işlemi denilebilir basit bir şekilde.
-
-2. Bir kodu ne kadar daha az okuna bilir kılarsanız anlaşılmasıda zorlaşır buda bir **Malware**'nin anlaşılmasını zorlaştıran bir yöntemdir.
-
-3. Örneğin elimizdeki **isim** değişkeni kod içerisinde **vtkej12ns** şeklinde göründüğünde bu değişkenin **isim** alanını tuttuğun anlamak zorlaşır ve buda **Obfuscated** bir değişkendir.
-
-Örnek bir **Obfuscate** edilmiş kod :
-
-![](https://i.hizliresim.com/0RPn3R.png)
-
-Yukarıda bulunan resimdeki basit bir **HTML** ve **Javascript** kodunun ne kadar karmaşıklaştırıldığı anlaşılabilir durumda.
-
-## How to unpack and deobfuscate
-
-Öncelikle aşşağıdakileri anlamakta zorluk çekebilecek arkadaşlarımız için bazı terimlerin türkçe karşılığını yazayım :
-
-**Portable Executable**
-* Çalıştırılabilir dosyamızdır. Buna uzantısı **.exe** vs.. olan dosyalarda denilebilir.
-
-**Packer**
-* Bir yazılımı **Sıkıştırmaya** yarayan yazılım.
-
-**Unpacker**
-* **Sıkıştırılmış** kodu eski haline getirmeye yarayan yazılım.
-
-**PE Sections**
-* Çalıştırılabilir dosyamızın içerdiği **Code**, **Data** gibi bilgileri tutan bölümlerdir.
-
-# Detecting packing and unpacking it
-
-#### Detecting packing
-
-**Pack** edilmiş bir **Malware**'yi **Unpack** etmek yani çözmek ise bazen işin en kolay kısmı olabilirken en zor kısmıda olabilir.
-
-Öncelikle pack edilmiş bir **Malware**'nin hangi pack yazılımını kullandığını bulmamız gerek.
-
-Fakat bunu gerçekleştirebilecek **Yazılım**'ları göstermeye geçmeden önce önemli bir not eklemek istiyorum. Hangi **pack** bulma yazılımını kullanırsanız kullanın bu yazılımlar sadece bilinen **Packer**'ların isimlerini tutuyor.
-
-Dolayısı ile bulunamayan bir **Packing** işlemini anlamak için **Portable Executable** yani **Çalıştırılabilir Dosya**'mızın **PE Section**'larına bakmamız gereklidir.
-
-**Pack** edilmiş bir **Malware**'nin hangi **Pack** yazılımını kullandığını bulmak için bazı araçlar :
-
-1. RDG Packer Detector
-
-2. PEiD
-
-Bu verdiğimiz toollardan eğer **Malware**'nin **Packer** adını çıkarabilirseniz bu **Packer**'in bir **Unpacker**'ini bulmaya aramaya başlayabilirsiniz.
-
-Eğer **Packer** adını verdiyse ve bu **Packer** için herhangi bir **Unpacker** bulunmuyorsa kendi ellerinizle işi bitirmeye kendinizi yavaştan hazırlamaya başlayın.
-
-**Packer**'in adını bulamadıysanız şayet **Portable Executable** içerisinde yani **Malware**'miz içerisinde bir **Packing** işleminin gerçekleştiğini anlamak için **PE Section**'larına bakmanız yeterli olacaktır.
-
-![](https://i.hizliresim.com/7aOgOm.png)
-
-Yukarıdaki fotorafta örnek bir **Portable Executable**'nin **UPX Packer** ile **Pack**'lendiğini görebiliriz.
-
-Genellik ile normal bir **PE**'nin içerdiği **Section**'lar dışında **Section**'lar içeren **PE**'ler **Packing** işlemine tabir tutulduğunu ortaya dökmemiz için bir yoldur.
-
-Ayrıca sadece **Packing** işlemi değil aynı zamanda bu **Section**'lar içerisinden **Zararlı Yazılım**'ın kendi içerisinden farklı bir yazılım çıkarttığı gibi değişik türde durumlara şahit olabilirsiniz.
-
-#### Unpacking
-
-Dosyanın yani **Malware**'nin bir **Packing** işlemi içerdiğini anladıktan sonra kendi elimizle **Unpack** etmek için herhangi bir **Debugger** aracılığı ile **Malware**'yi izleyip kendini **Memory** İçerisinde **Unpack** ettikten sonra **Unpack** edilmiş **Kodu** dışarıya bir **.exe** olarak aktarabiliriz.
-
-Bir arkadaşımız **Amber Packer** adında bir **Packing** yazılımı geliştirdi. Yukarıda bahsettiğimiz toollardan neredeyse hepsi bunu bulamıyor.
-
-Ve bulamamasına rağmen yukarıda bahsettiğim tekniği kullanıp bu **Packing** edilmiş dosyayı **Unpack** edip bunu blog yazısına döken sevdiğim bir arkadaşımın blog yazısı :
-
-[Amber unpacking](https://robindimyan.blogspot.com/2018/02/dkhos-rev300-cozumu.html)
-
-# Detecting obfuscating and deobfuscating it
-#### Detecting Obfuscating
-
-**Detecting** kısmı çok basit.
-
-Anlaşılabilir bir **Kod** ise şayet **Obfuscated** bir **Kod** değildir.
-
-Anlaşılmaz bir **Kod** ise **Obfuscated** bir **Kod** olduğu söylenebilir.
-
-![](https://i.hizliresim.com/V9ZYvB.png)
-
-#### Deobfuscating
-
-Bir **Obfuscated** kodu **Deobfuscate** etmek için **Değişkenlerin**, **Fonksiyonların** neler yaptığını takip edip sonra yaptığı şeye göre tekrar isimlendirebilirsiniz.
-
-Ya da internette bulunan **Deobfuscation Tool**'larından yararlanabilirsiniz.
-
-Buraya 13 tanesinin listelendiği bir forum post'unu bırakıyorum :
-
-[13 Deobfuscator Tools](https://rstforums.com/forum/topic/103595-13-deobfuscation-tools-for-reverse-engineers/)
-
-Basit bir şekilde bir **Malware**'nin yapılması gereken ilk iki **Statik** analizinden bahsettim.
-
-Şimdi yavaştan **Malware**'mizin diğer **Statik** analizlerini yapıp **Zararlı yazılımımızı** dahada yakından tanıyalım.
-
-## Linked Libraries And Functions
-
-Bir **Malware**'yi yani **Zararlı Yazılım**'ı daha yakından tanımak için içerdiği **Kütüphane** ve **Fonksiyon**'lara bakmamız yeterli olacaktır.
-
-15 kilo dumbell'ı kanadıma çektikten sonra bu kısımı daha da derinden inceleyeceğiz.
-
-Ve çokta zorlu olmayan setlerden sonra geldim.
-
-Şimdi örnek bir **Malware**'nin **Kütüphane** ve **Fonksiyon**'larını listelemek için kendi yazdığım [peanalyzer](https://github.com/blacknbunny/peanalyzer) tool'unu kullanıp **Malware**'miz neler yapıyor inceleyelim.
-
-Tool'u indirdikten sonra :
+* Aşşağıdaki Source Kodu Shared Object (.SO) şeklinde derliyoruz.
+* LD_PRELOAD dış değişkenine atıyoruz.
+* Programı debugger ile yeniden çalıştırıyoruz.
+* Anti ptrace Bypass Source (bypass.c) :
 
 ```
-python peanalyzer.py --file file.exe --show imports
+long ptrace(int request, int pid, int addr, int data)
+{
+    return 0;
+}
+```
+Derlemek : `$ gcc bypass.c -o bypass.so -fPIC -shared -ldl -D_GNU_SOURCE`
+
+Çalıştırmak : `$ export LD_PRELOAD="/home/user/bypass.so" && gdb -q antidebugger`
+
+
+**Burada ne yaptık ?**
+
+Özetle anlatmak gerekirse; Anti debugger source (bypass.c) içerisinde ptrace fonksiyonunun yerine geçecek bir sahte fonksiyon hazırladık , ardından Shared Object Library halinde bu dosyayı derledik ve **LD_PRELOAD** ortam değikeni içerisine atarak programın içine dahil olmasını sağladık ve bizim sahte fonksiyonumuz gerçek olanın yerine geçti , bu sayede debugger ımızın çalışmasını engelleyen ptrace fonksiyonunu işlevsiz hale getirmiş olduk.
+
+Ne yaptığımızı anlamayan arkadaşlar için ufak bir video hazırladım, izleyerek uygulayabilirler…
+
+[https://www.youtube.com/watch?v=LmM_8O26Xgw](https://www.youtube.com/watch?v=LmM_8O26Xgw)
+
+
+**NOT :** Bundan sonraki Anti Analysis Teknikleri için herhangi bir uygulamada bulunmayacağım , Teknik hakkında detay ve hijack için gereken library 'i verip geçeceğim. Zira videodan sonra uygulamayı artık öğrenmiş olmamız gerek…
+
+
+
+
+
+**2) - Anti Breakpoint Tekniği**
+
+Bir program debug edilirken programın belirli noktalarına breakpoint koyarak istenilen noktalarda durmasını sağlar ve programın o anki durumunu inceleriz.
+
+Breakpoint koymanın debuggerler tarafından kullanılan en popüler yolu **int 3** instruction’ı kullanmaktır. Bu instruction çalıştığında kernel’a ***SIGTRAP*** sinyali yollanıp programın çalışması durdurulur. Programın durmasını istediğimiz yere ***int 3*** instructionının opcode’u olan ***0xCC*** değerini yazarak breakpoint koymuş oluruz.
+
+Bu programda ilk fonksiyonun adresinden son fonksiyonun adresine kadar olan bellek alanı taranarak ***0xCC*** değerinin var olup olmadığına bakılır. Şayet belirtilen alan içerisinde bu değer yer alıyorsa bu breakpoint varlığına işarettir.
+
+Anti Breakpoint Source :
+```
+#include <stdio.h>
+#include <stdlib.h>
+
+void dummy();
+
+void check_breakpoint()
+{
+	for (int i = &check_breakpoint; i <= &dummy+3; i++ ) // "check_breakpoint" fonksiyonundan "dummy" fonksiyonuna kadar olan kısmı
+  {                                                    // yani diğer bir deyişle programımızı baştan sonra tarıyoruz.
+		char *p = i;
+		if ( (*p) & 0xff == 0xcc) // şayet herhangi bir adresin değeri "int 3" (breakpoint) opcode'una eşit ise bu debugger kullanıldığına işarettir.
+			exit(0); // bu durumda program kapansın.
+	}
+
+}
+
+int main()
+{
+	check_breakpoint();
+	puts("No breakpoints detected! Starting evil stuff..");
+
+	return 0;
+}
+
+void dummy()
+{
+	__asm__("nop");
+}
 ```
 
-Demeniz yeterli olacaktır.
+**Anti Breakpoint Bypass :** Burada programın içinde bulunan fonksiyonları objdump aracı ile tespit edip **dummy() , check_breakpoint() , exit()** fonksiyonlarından birini Hijack edebiliriz. Veya daha daha çılgınca davranıp fonksiyonların kullandığı **syscal** lari hijack etmeye çalışabiliriz, burdan sonrası hayal gücünüze kalmış…
 
-Sonrasındaki çıktıda **Kütüphaneler**  içerisinden **Program** içerisinde hangi fonksiyonların kullanıldığını listelemiş olacağız.
+Ben burada **exit()** fonksiyonunu hijack ederek **main()** fonksiyonuna yönlendirmeyi tercih ettim;
 
-![](https://i.hizliresim.com/169dp1.png)
-
-Bu bir **Malware**'nin kullandığı fonksiyonlar değil yalnız bu **Fonksiyonlar** arasından **ShellExecuteW**, **GetCurrentProcess** gibi **Fonksiyonlar** genellik ile **Malware**'ler tarafından kullanılıyor.
-
-Burada objektif bir şekilde anlatıyorum size bunu. Artık siz kendi inceleyeceğiniz **Malware**'yi daha yakından tanımak için neler yapmanız gerektiğini daha iyi anlayacaksınız.
-
-Yani bir **Zararlı Yazılım**'ın herhangi bir **Internet Sayfasından** dosya indirdiğini **Fonksiyonlar** aracılığıyla görmek mümkün.
-
-Ve bu sayede kafanızda **Zararlı Yazılım**'ın neler yaptığına dair kafamızda bir şema olacaktır.
-
-**Kütüphaneler**'in ve **Fonksiyon**'ların **Statik** bir analiz içerisinde ne gibi büyük bir rol oynadığını bu şekilde anlayabilirsiniz.
-
-## Disassemble, Decompiling, Patching
-
-#### Disassemble
-
-**Statik** bir analiz içerisinde ayrıca **Malware**'nin nasıl bir gidişat izlediğini görmek ve düzenlemek bize ayrıca büyük bir avantaj sağlar.
-
-Yukarıda da kullandığımız [peanalyzer](https://github.com/blacknbunny/peanalyzer) tool'u yazılımları **Disassemble** etmemize yarıyor.
+Hijack Library ( Anti Breakpoint) :
 
 ```
-python peanalyzer.py --file file.exe --disassemble all
+long exit(int request, int pid, int addr, int data)
+{
+    main();
+    return 0;
+}
 ```
 
-![](https://i.hizliresim.com/jgEnDn.gif)
-
-**File.exe**'yi bir malware olarak düşünürsek şayet **Assembly** dilinde neler yaptığını incelememiz çok yararlı olacaktır.
-
-#### Decompiling
-
-Şayet bazı **Malware**'leri **Assembly** değilde kendi dilinden okumak mümkün olabiliyor.
-
-Örneğin bir **C#** ile yazılan **Malware**'nin **Kaynak Kod**'u verilmesede bazı araçlar ile o **Kaynak Kod**'u almak mümkün.
-
-Yani kısaca **Compile** edilip **Assembly**'e çevirilen bir kodu tekrar eski haline çevirmek **Decompiling** oluyor.
-
-Dahada kısaca aşşağıdaki fotorafı tersine çevirdiğinizde olan şey basit bir şekilde **Decompiling**.
-
-![](https://i.hizliresim.com/zjW4ZY.png)
-
-#### Patching
-
-**Hex Code**'ları yani **Shellcode**'ları ile oynama zamanı geldi demek bu.
-
-Diyelim ki **Zararlı Yazılım**'ı geliştiren kişi **UploadFileToServer** adında bir fonksiyon geliştirdi **Program** içerisinde.
-
-Ve sizin bazı özel dosyalarınızı kendi **Sunucu**'suna yüklüyor. Ve bu şekilde **Sunucu**'dan direk bu dosyalara ulaşabiliyor.
-
-Diyelim ki bu **Fonksiyon** 1 adet string alıyor parametre olarak. Ve bu parametrede yükleyeceği dosya olsun.
-
-Ve bu parametreyide **Zararlı Yazılım Geliştiricisi** özel olarak **secret.txt** olarak atadı.
-
-Şayet biz bunu program içerisinde **Hex Code**'ları arasında değiştirip **reverseshell.php** adında kendi yazdığımız küçük bir **Reverse Shell** kodları içeren **PHP** dosyası ile değiştirdik.
-
-Ve bilgisayarımızdan **PORT**'u dinlemeye başladık.
-
-Bu dosya **Remote Server**'e yükleneceğinden. **Zararlı Yazılım** geliştiricisinin sunucusuna basit bir şekilde ulaşabileceğiz.
-
-Ve basit bir şekilde **Patching** bu.
-
-## PE İçerisinden Alabileceğimiz Bilgiler
-
-**TimeDateStamp** : Yazılan **Program**'ın yani **Zararlı Yazılım**'ın ne tarihte ve ne zamanda **Compile** edildiği bilgisini tutar.
-
-Bu bilgi değiştirilebilirdir **Expert Malware Developer** arkadaşlarımız genellikle bunun yerine sahte bir bilgi koymayı tercih eder malum çok büyük bir yazılım ise şayet devlet baba uyumuyor.
-
-![](https://i.hizliresim.com/grNoE0.png)
-
-Bunun dışında **Yazılım**'ın hangi dil ile geliştirdiği,
-
-**Compiler** olarak ne kullanıldığı dair tüm bilgileri içerir.
-
-**Windows**'un **PE** dökümantasyonu :
-
-[PE Format](https://docs.microsoft.com/en-us/windows/desktop/debug/pe-format)
-
-## Statik analiz için işimizi kolaylaştıracak kaynaklar ve birkaç tool
-
-#### Genellikle kullandığım araçlar :
 
 
-* **RegShot** : **Malware** çalışmadan önce **Registry**'i kaydedip çalıştıktan sonraki ile karşılaştırmamıza yarıyor. Basitce **Malware**'nin **Registry** içerisinde neleri değiştirdiğini inceleyebiliriz.
+**3)- Anti Binary Modification Tekniği**
 
-* **PE-Bear** : Zamanında **CIA**'inde kullandığı bir **PE View** aracı.
+Analistler inceledikleri bir programda bulunan kontrolleri aşmak adına programda bazı yerleri modifiye edip bu kontrolleri bypass edebilirler. Bu yönteme binary modification veya patching adı verilir. **Anti-patching** tekniğinin mantığı program çalışmaya başlamadan önce kodların checksum değerini hesaplayıp önceden hesaplanmış esas checksum değeri ile karşılaştırarak programın değiştirilip değiştirilmediğini bulmaya çalışmaktır.
 
-#### Güzel kaynaklar :
+Orijinal checksum değerinin depolandığı yer checksum hesabını etkilememesi adına *text* segmentinden farklı bir segmentte bulunmalıdır. Dolayısıyla örnek programda bu değeri depolayacak değişken static char olarak belirlenmiştir. Bu değer debugger aracılığıyla bulunabilir veya elle opcode değerlerinin toplanması yoluyla hesaplanabilir. Checksum hesabı için de çok basit bir algoritma kullanılmıştır.
 
-[malwareanalysis.tools](http://malwareanalysis.tools/) : Web sayfası içerisinden analizini yaptığınız malware için ne gerekiyorsa basit bir şekilde ulaşabilmenizi sağlayan yararlı bir sayfa.
+Source Code :
+```
+#include <stdio.h>
+#include <stdlib.h>
 
-[awesome-malware-analysis](https://github.com/rshipp/awesome-malware-analysis) : Güzel bir **Cheat Sheet** malware analizi için.
+void dummy();
+
+void check_patching()
+{
+	char chk;
+	static char checksum = 0x64; // Olması gereken checksum değeri. Debugger ile elde edilebilir. Farklı segmentte yer alması için static char olarak tanımlandı.
+
+	for (int i = &check_patching; i <= &dummy+3; i++ ) // anti-breakpoint tekniğinde olduğu gibi bütün kod alanını tarıyoruz
+	{
+		char *p = i;
+		chk += (*p) & 0xff; // Çok basit bir checksum algoritması, byte'ları toplayarak gidiyor.
+	}
+
+	if (chk != checksum) // Byte'ların toplamı asıl checksum değerine eşit değilse bu programın modifiye edildiğine işaret
+		exit(0); // Bu durumda programı kapatalım.
+}
+
+int main()
+{
+	check_patching();
+	puts("No patching detected! Starting evil stuff.."); // Pis işlerimiz..
+
+	return 0;
+}
+
+void dummy()
+{
+	__asm__("nop");
+}
+```
+**Anti Binary Modification Bypass :** Bu yöntemin program üzerinde herhangi bir patchleme işlemi yapılmıyacaksa bypass edilmesine gerek yok fakat , bypass etmek istersek objdump aracı ile fonksiyon isimlerini belirleyip hijack library hazırlayabilirsiniz. Veya **exit()** fonksiyonunu hijack etmek işinizi görecektir…
+
+
+
+**4)- Anti Hook Tekniği**
+
+Gelelim işin en trajikomik kısımına , zararlı yazılım geliştiricilerinin fonksiyonları hooklamamızı engelleyeceğini düşündüğü kod parçasına, bu yöntem bizim Fonksiyonları hijack etmemizi engellemek üzerine kuruludur,
+
+Source Kod :
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+
+void check_hook()
+{
+	if (getenv("LD_PRELOAD") != NULL) // LD_PRELOAD ortam değişkeninin içi doluysa bu function hook yapıldığına işaret.
+		exit(0); // Bu durumda programı kapatalım.
+}
+
+int main()
+{
+	check_hook();
+	puts("No hooks detected! Starting evil stuff..");
+
+	return 0;
+}
+
+```
+
+Anti Hook Bypass : Programın çalışma sırasında **getenv()** fonksiyonu kullanarak *LD_PRELOAD* dış değişkeninin boş olup olmadığı kontrol edilir, bunun Analistleri engelliyeceğini sanmışlar, asıl komedi de burada başlıyor. Kontrol programın çalışma sırasında yapılırken, biz programa fonksiyonu **Load Time** 'da iken inject ediyoruz. Yani bu demek oluyor ki biz kontrolü atlamak için **getenv()** fonksiyonuna müdehale edebiliriz :)))
+
+Kullanacağımız Library :
+
+```
+long getenv(int request, int pid, int addr, int data)
+{
+    return 0;
+}
+```
+
+**Örneklerin Derlenmiş Halleri , Bypass Libraryleri ve python ile otomatize edilmiş hallerini bir Repository 'de topladım.
+
+AntiAnalysis uygulamasını derledikten sonra , **“python bypass.py ./anti-ptrace”** şekinde çalıştırmanız yeterli olacaktır.
+
+**NOT : Çalışması için GDB kurulu olmalıdır , başka debugger kullanmak isterseniz *bypass.py 'nin 34. Satırındaki* *gdb -q* başlatıcısını değiştirmeniz yeterli olacaktır…**
+
+**Repository :**
+![](https://github.com/0x00fy/Linux-Anti-Analysis-Bypass)
+
 
 ## THE END
 
-Umarım yazıyı okurken keyif almışsınızdır.
+Makale Hakkında Kafanıza Takılan Soruları , Yanlış veya Eksik gördüğünüz yerleri vs. Yorumlaeda belirtebilirsiniz…
 
-Sorular için twitter : [0DAYanc](https://twitter.com/0DAYanc)
+Birdahaki yazımda görüşmek üzere , esen kalın…
