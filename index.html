@@ -1,0 +1,22 @@
+---
+layout: default
+---
+<div class="home">
+	<section class="site-header">
+		<h1 class="smallcap"><a class="site-title" href="{{ site.baseurl }}/">{{ site.title }}</a></h1>
+		<p>"Jack of all trades, master of none is oftentimes better than master of one."</p>
+	</section>
+	<section>
+		<h1 class="smallcap">Front End</h1>
+		<ul class="post-list">
+			{% for post in site.posts %}
+				{% if post.tags[1] == 'Front End' %}
+					<li>
+						<a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a> <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time>
+					</li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+	</section>
+
+</div>
