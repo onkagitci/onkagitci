@@ -14,7 +14,7 @@ Günümüzde zararlı yazılım geliştiricileri yazdıkları zararlı yazılım
 
 ***disassembling, debugging, patching, function hooking, virtual machine olarak isimlendirilebilir…***
 
-Bu yazımda en yaygın **Anti Analysis** tekniklerini ve bypass yöntemlerini anlatacağım. Herşeyden önce bu yazıdaki bypass yöntemlerini daha iyi anlayabilmeniz açısından [Linux Load Time Function Hijacking](https://twitter.com/0DAYanc) yazısını okumanızı tavsiye ediyorum, bu yazıda kullanacağımız bypass teknikleri **Linux Load Time Function Hijacking (via shared object injection)** methodu üzerine kuruludur. Artık Gerekli şeyleri öğrendiğinizi farzederek Anti Analysis tekniklerini ve Bypass Methodlarını Sırayla anlatmaya başlıyorum ;
+Bu yazımda en yaygın **Anti Analysis** tekniklerini ve bypass yöntemlerini anlatacağım. Herşeyden önce bu yazıdaki bypass yöntemlerini daha iyi anlayabilmeniz açısından [Linux Load Time Function Hijacking](http://modebit0.ifo) yazısını okumanızı tavsiye ediyorum, bu yazıda kullanacağımız bypass teknikleri **Linux Load Time Function Hijacking (via shared object injection)** methodu üzerine kuruludur. Artık Gerekli şeyleri öğrendiğinizi farzederek Anti Analysis tekniklerini ve Bypass Methodlarını Sırayla anlatmaya başlıyorum ;
 
 
 ## **1) - Anti Ptrace Tekniği**
