@@ -125,7 +125,7 @@ Bu noktada, dahil olmak istediğimiz Process durdurulur ve onu istediğimiz zama
  
 ***Aşşağıda gördüğümüz inject_data() Fonksiyonu ise,*** 
 
-
+```
 int inject_data (pid_t pid, unsigned char *src, void *dst, int len)
 {
 int i;
@@ -142,6 +142,7 @@ uint32_t *d = (uint32_t *) dst;
     }
   return 0;
 }
+```
 
 görüldüğü üzere **prtace** çağrısının **“PTRACE_POKETEXT”** parametresi ; “inject_data” fonksiyonunun parametreleri ile aldığımız verileri (Shellcode , Shellcode inject edileceği yer vs.) üzerinde Debugging işlemi uyguladığımız asıl process’e yazmamızı sağlar bu aynı zamanda process 'e nasıl shellcode inject ettiğimizi de açıklıyor.
 
@@ -150,11 +151,11 @@ görüldüğü üzere **prtace** çağrısının **“PTRACE_POKETEXT”** param
 
 ***Burada ise,*** 
 
-
+```
   printf ("+ Injecting shell code at %p\n", (void*)regs.rip);
   inject_data (target, shellcode, (void*)regs.rip, SHELLCODE_SIZE);
   regs.rip += 2;
-  
+```  
   
 Kontrolümüz altındaki process 'e shellcode enjekte etmek için kullanacağımız “inject_data” fonsiyonu çağırılır. Burada bulunan regs.rip ise bize daha önceden regs ismindeki değişkene atadığımız Registerlar içerisinden (x64 Mimariye göre) Instruction Pointerı bize verir.  
   
