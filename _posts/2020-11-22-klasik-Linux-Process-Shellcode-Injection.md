@@ -1,7 +1,7 @@
 ---
-title: Linux Process Shellcode Injection
+title: Klasik Linux Process Shellcode Injection
 layout: post
-tags: [Linux,Analysis]
+tags: [Linux,Shellcode,Injection]
 author: 0x00fy
 ---
 
