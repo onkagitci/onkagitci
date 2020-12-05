@@ -16,7 +16,10 @@ Bundan sonraki yazılarımızda bir Rootkit'in Ne işe yaradığı , neler yapt�
 
 
 
-![Autro](https://raw.githubusercontent.com/0x00fy/Gamli-Baykus/main/autro.jpg)
+
+
+
+![](https://raw.githubusercontent.com/0x00fy/Gamli-Baykus/main/autro.jpg)
 
 
 
