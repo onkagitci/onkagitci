@@ -12,7 +12,7 @@ Bundan sonraki yazılarımızda bir Rootkit'in Ne işe yaradığı , neler yapt�
 ### GAMLI BAYKUŞ KERNEL MODE ROOTKİT
 
 
-** PROJE GITHUB LINKI : https://github.com/0x00fy/Gamli-Baykus **
+**PROJE GITHUB LINKI : https://github.com/0x00fy/Gamli-Baykus**
 
 
 
