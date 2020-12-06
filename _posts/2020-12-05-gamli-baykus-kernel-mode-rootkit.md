@@ -5,6 +5,10 @@ tags: [Linux,Kernel]
 author: 0x00fy
 ---
 
+![](https://raw.githubusercontent.com/0x00fy/Gamli-Baykus/main/autro.jpg)
+
+
+
 Boş zamanlarımda uğraştığım bir projeydi yeni tamamlayabildim, Örnek olması açısından sizlerle paylaşıyorum. Bu da Rootkit Development Serimizin  Başlangıç yazısı oluyor bir nevi ,
 Bundan sonraki yazılarımızda bir Rootkit'in Ne işe yaradığı , neler yaptığı hakkında ufak bir bilgi vererek başlangıç yapacağız. O zamana kadar esen kalın, Serimizin bir sonraki yazısında görüşmek üzere..
 
@@ -13,15 +17,6 @@ Bundan sonraki yazılarımızda bir Rootkit'in Ne işe yaradığı , neler yapt�
 
 
 **PROJE GITHUB LINKI : [https://github.com/0x00fy/Gamli-Baykus](https://github.com/0x00fy/Gamli-Baykus)**
-
-
-
-
-
-
-![](https://raw.githubusercontent.com/0x00fy/Gamli-Baykus/main/autro.jpg)
-
-
 
 
 **Kernel Mode Rootkit**
