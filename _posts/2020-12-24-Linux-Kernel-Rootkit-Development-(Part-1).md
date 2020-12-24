@@ -23,3 +23,19 @@ Bu Seride **LKM Hacking** üzerine daha deyatlı anlatımlar olacak , Peki bu se
 ### 1. LKM Nedir ?
 
   **LKM'ler, Linux çekirdeği tarafından işlevselliğini genişletmek için sağlanan Yüklenebilir Çekirdek Modülleri Servisidir. Bu LKM'lerin avantajı: Dinamik olarak yüklenebilir olması ve Yüklendikten sonra Linux Çekirdeğini Yeniden Derlemeyi Gerektirmemesidir.. Bundan önceki dönemlerde Kernel 'a yeni bir işlev kazandırmak için Gereken Eklemeler yapıldıktan sonra Kernel Yeniden Derlenirdi**, ***LKM nin ortaya çıkışı temelde bu soruna çözüm olmuştur..***
+
+ Tüm LKM ler Temelde 2 Fonksiyondan oluşur(Minimum) Bunlar, **init** ve **exit** 'dir
+ 
+ ```
+ int init_module(void) /*Yüklendikten sonra çalışacak kısım*/
+{
+
+.. Bla Bla ..
+
+}
+
+void cleanup_module(void) /* Uninstall Sırasında Çalışacak Kısım */
+{
+.. Bla Bla..
+}
+```
