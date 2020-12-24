@@ -12,6 +12,6 @@ Bu Seride **LKM Hacking** üzerine daha deyatlı anlatımlar olacak , Peki bu se
 
 **Aslında Bunun Birçok Sebebi Var Kaba Taslak Şunlar ;**
 
-* ** Bu Konuda Yeterli Türkçe Kaynak Bulunmaması.**
-* ** Aynı Türkçe Kaynakların Sürekli Farklı yerlerde yeni kaynak gibi Lanse edilmesi **
-* ** Var olan Türkçe Kaynakların Baştan sona bir Kernel Rootkit geliştirmek için Yeterli Olmaması **
+* **Bu Konuda Yeterli Türkçe Kaynak Bulunmaması.**
+* **Aynı Türkçe Kaynakların Sürekli Farklı yerlerde yeni kaynak gibi Lanse edilmesi**
+* **Var olan Türkçe Kaynakların Baştan sona bir Kernel Rootkit geliştirmek için Yeterli Olmaması**
