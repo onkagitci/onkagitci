@@ -1,5 +1,5 @@
 ---
-title: Kernel Rootkit Development - (Part 1)
+title: Linux Kernel Rootkit Development - (Part 1)
 layout: post
 tags: [Linux,Rootkit,Zararli]
 author: 0x00fy
