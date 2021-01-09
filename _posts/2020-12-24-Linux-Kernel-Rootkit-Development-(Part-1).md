@@ -145,7 +145,7 @@ hemen ardından `lsmod | grep modul` komutu ile sisteme yüklenmiş modüller i�
 gelelim silme işlemine; `sudo rmmod modul` komutu ile modülümüzü kernel dan siliyoruz..
 
 
-II. Sistem Çağrıları
+### II. Sistem Çağrıları
 
 1. Bölümde ilk kernel modülümüzü oluşturduk, ancak şimdi onun harika bir şey yapmasını istiyorsunuz - çalışan kernel 'ın davranışını değiştirmek gibi bir şey. Bunu yapmamız için gereken şey kernel mod Fonksiyonlarını hook etmektir , ancak soru şu - hangi fonksiyonları hooklayacağımızı nasıl bileceğiz?
 
@@ -165,6 +165,9 @@ Neyse ki bizim için Torvalds amcamızın hazırladığı harika bir potansiyel 
    *mkdir
 
 
+X86_64 sistem çağrılarının tam listesini burada[]!https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl görebilirsiniz. Bu işlevlerden herhangi birine kendi işlevselliğimizi eklemek çok ilginç olabilir. Bazı dosyalara yapılan okuma çağrılarını yakalayabilir ve farklı bir şey döndürebilir veya execve ile özel ortam değişkenleri ekleyebiliriz. Bazı eylemleri gerçekleştirmek için rootkit'imize komutlar göndermek için öldürmede kullanılmayan bazı sinyalleri bile kullanabiliriz.
+
+Ama önce, kullanıcı alanından nasıl sistem çağrısı yaptığımıza dair daha iyi bir fikre sahip olmak faydalı olacaktır - sonuçta, müdahale etmeyi umduğumuz bu süreçtir!
 
 
 
