@@ -155,14 +155,14 @@ Neyse ki bizim için Torvalds amcamızın hazırladığı harika bir potansiyel 
 
 İlerleyen Bölümlerde sıklıkla karşımıza çıkacak oalan bazı sistem çağrıları :
 
-     *open
-     *read
-     *write
-     *close
-     *execve
-     *fork
-     *kill
-     *mkdir
+   *open
+   *read
+   *write
+   *close
+   *execve
+   *fork
+   *kill
+   *mkdir
 
 
 
