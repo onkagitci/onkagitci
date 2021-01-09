@@ -87,10 +87,10 @@ static int __init example_init(void)
 }`example_exit` fonksiyonu içerisinde 
 ```
 
-**Derleme İşlemi : **
+**Derleme İşlemi :**
 
 
-***modul.c içeriği : ***
+***modul.c içeriği :***
 
  ```
 #include <linux/init.h>
