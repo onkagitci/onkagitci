@@ -87,10 +87,10 @@ static int __init example_init(void)
 }`example_exit` fonksiyonu içerisinde 
 ```
 
-`**Derleme İşlemi :**`
+###**`a)- Derleme İşlemi :`**
 
 
-`***modul.c içeriği :***`
+***`modul.c içeriği :`***
 
  ```
 #include <linux/init.h>
@@ -119,7 +119,7 @@ module_exit(example_exit);
 
 
 
-`***Makefile dosyası içeriği :***`
+***`Makefile dosyası içeriği :`***
 
 ```
 obj-m += modul.o
@@ -133,7 +133,7 @@ Makefile dosyamızı kaydettikten sonra derlemek için Terminalimizin komut sat�
 bu işlemin ardından birkaç dosya oluşmuş olacak.
 
 
- **`Modülü kernel 'a Load ve Unload Etmek :`** 
+###**`b)- Modülü kernel 'a Load ve Unload Etmek :`** 
 
 `sudo insmod module.ko` Komutu ile modülümüzü kernel 'a Load ediyoruz 
 
