@@ -138,11 +138,35 @@ bu işlemin ardından birkaç dosya oluşmuş olacak.
 
 `sudo insmod module.ko` Komutu ile modülümüzü kernel 'a Load ediyoruz 
 
-ardından `dmesg` komutu ile `example_init` fonksiyonunun işlevini yerine getirdiğini görüyoruz.
+ardından `sudo dmesg -C` komutu ile `example_init` fonksiyonunun işlevini yerine getirdiğini görüyoruz.
 
 hemen ardından `lsmod | grep modul` komutu ile sisteme yüklenmiş modüller içinden kendi modülümüzü ayıklayıp görebiliyoruz
 
 gelelim silme işlemine; `sudo rmmod modul` komutu ile modülümüzü kernel dan siliyoruz..
+
+
+II. Sistem Çağrıları
+
+1. Bölümde ilk kernel modülümüzü oluşturduk, ancak şimdi onun harika bir şey yapmasını istiyorsunuz - çalışan kernel 'ın davranışını değiştirmek gibi bir şey. Bunu yapmamız için gereken şey kernel mod Fonksiyonlarını hook etmektir , ancak soru şu - hangi fonksiyonları hooklayacağımızı nasıl bileceğiz?
+
+Neyse ki bizim için Torvalds amcamızın hazırladığı harika bir potansiyel hedef listesi var: *sistem çağrıları!*
+
+**Sistem çağrıları (Syscalls) :**  userspace (ring3) 'den çağrılabilen ve Kernel da neredeyse her şey için gerekli olan Kernel Land (ring0) fonksiyonlarıdır.
+
+İlerleyen Bölümlerde sıklıkla karşımıza çıkacak oalan bazı sistem çağrıları :
+
+     *open
+     *read
+     *write
+     *close
+     *execve
+     *fork
+     *kill
+     *mkdir
+
+
+
+
 
 
 
