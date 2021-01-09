@@ -133,7 +133,7 @@ Makefile dosyamızı kaydettikten sonra derlemek için Terminalimizin komut sat�
 bu işlemin ardından birkaç dosya oluşmuş olacak.
 
 
-` **Modülü kernel 'a Load ve Unload Etmek : ** `
+ **`Modülü kernel 'a Load ve Unload Etmek :`** 
 
 `sudo insmod module.ko` Komutu ile modülümüzü kernel 'a Load ediyoruz 
 
