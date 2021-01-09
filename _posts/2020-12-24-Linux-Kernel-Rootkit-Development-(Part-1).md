@@ -165,9 +165,11 @@ Neyse ki bizim için Torvalds amcamızın hazırladığı harika bir potansiyel 
    *mkdir
 
 
-X86_64 sistem çağrılarının tam listesini burada[]!https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl görebilirsiniz. Bu işlevlerden herhangi birine kendi işlevselliğimizi eklemek çok ilginç olabilir. Bazı dosyalara yapılan okuma çağrılarını yakalayabilir ve farklı bir şey döndürebilir veya execve ile özel ortam değişkenleri ekleyebiliriz. Bazı eylemleri gerçekleştirmek için rootkit'imize komutlar göndermek için öldürmede kullanılmayan bazı sinyalleri bile kullanabiliriz.
+X86_64 sistem çağrılarının tam listesini [Burada](https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl) görebilirsiniz. Bu fonksiyonlardan herhangi birinin kendi isteklerimiz ve pis işlerimiz doğrultusunda çalışması ne güzel olurdu değilmi. Bazı dosyalara yapılan okuma çağrılarını yakalayabilir ve farklı bir şey döndürebilir veya execve ile özel envirionment variables ekleyebiliriz. Bazı eylemleri gerçekleştirmek için rootkit'imize komutlar göndermek için kill fonksiyonunda kullanılmayan bazı sinyalleri bile kullanabiliriz. (Daha önce Ghost Rootkit , Antiy4 vs. Rootkitlerde yapıldı)
 
-Ama önce, kullanıcı alanından nasıl sistem çağrısı yaptığımıza dair daha iyi bir fikre sahip olmak faydalı olacaktır - sonuçta, müdahale etmeyi umduğumuz bu süreçtir!
+Ama önce, user landdan nasıl sistem çağrısı yaptığımıza dair daha iyi bir fikre sahip olmak faydalı olacaktır - sonuçta, müdahale etmeyi istediğimiz şey bir process!
+
+
 
 
 
