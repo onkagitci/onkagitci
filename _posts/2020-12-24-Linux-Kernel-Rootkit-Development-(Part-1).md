@@ -87,7 +87,7 @@ static int __init example_init(void)
 }`example_exit` fonksiyonu içerisinde 
 ```
 
-   ###a)- Derleme İşlemi :
+   ### `a)- Derleme İşlemi :`
 
 
 ***`modul.c içeriği :`***
@@ -133,7 +133,7 @@ Makefile dosyamızı kaydettikten sonra derlemek için Terminalimizin komut sat�
 bu işlemin ardından birkaç dosya oluşmuş olacak.
 
 
-   ###b)- Modülü kernel 'a Load ve Unload Etmek :
+   ### `b)- Modülü kernel 'a Load ve Unload Etmek :`
 
 `sudo insmod module.ko` Komutu ile modülümüzü kernel 'a Load ediyoruz 
 
