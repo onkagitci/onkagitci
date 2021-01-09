@@ -1,7 +1,7 @@
 ---
-title: Linux Kernel Rootkit Development - (Part 1)
+title: Linux Kernel Rootkit Development Handbook - (Part 1)
 layout: post
-tags: [Linux,Rootkit,Zararli]
+tags: [Linux,Rootkit,Zararli,syscall,ftrace]
 author: 0x00fy
 ---
 
