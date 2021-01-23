@@ -180,7 +180,8 @@ Bu, en iyi bir örnekle açıklanır - syscall 0, `sys_read`'ı inceleyelim (tü
 
 `*fd` dosya tanımlayıcısıdır ve `open()` çağrısından döndürülür, `buf` okunan veriyi saklamak için bir arabellektir ve `count` okunacak bayt sayısıdır. Dönüş değeri, başarıyla okunan bayt sayısıdır ve hata durumunda -1 değerini alır.
 
-https://i.imgur.com/SzlZhQs.jpg
+![](https://i.imgur.com/SzlZhQs.jpg)
+
 
 
 Böylece, `rdi` file pointer 'ı, `rsi` buffer 'a bir pointer ve `rdx` okunacak bayt sayısını alır.`0x00`'ı rax'a kaydetmiş olduğumuz sürece, devam edip Kernel'a teslim edebiliriz ve sistem çağrımız gerçekleşecektir! Örnek bir NASM parçası şu lekildedir:
