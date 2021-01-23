@@ -311,6 +311,26 @@ asmlinkage int hook_mkdir(const char __user *pathname, umode_t mode)
 #endif
 ```
 
+Burada dikkat edilmesi gereken ilk şey, if / else ön işlemci koşuluyla ayrılmış, neredeyse aynı 2 fonksıyonumuz var.
+
+Kernel sürümünü ve mimarisini kontrol ettikten sonra, `PTREGS_SYSCALL_STUBS` tanımlanabilir veya tanımlanmayabilir. Öyleyse, `pt_regs` yapısını kullanmak için hem `orig_mkdir` function pointer'ını hem de `hook_mkdir` deklarasyonunu tanımlamamız gerekir. Aksi takdirde, argümanların gerçek adlarını kullanarak tam bildirim vereceğiz.
+
+```
+char __user *pathname = (char *)regs->di;
+```
+
+ 
+`pathname` bağımsız değişkenini regs yapısından çıkarmak için.
+
+Dikkat edilmesi gereken diğer önemli nokta `strncpy_from_user()` fonksiyonu kullanılmasıdır. `pathname` bağımsız değişkeni için `__user` tanımlayıcısının mevcudiyeti, usermoddaki, mutlaka adres alanımıza eşlenmesi gerekmeyen bir konuma işaret ettiği anlamına gelir. `pathname` referansını kaldırmaya çalışmak, bir segfault veya geri dönen çöp baytların `printk()` tarafından yazdırılmasına neden olacaktır. Bu senaryoların hiçbiri çok kullanışlı değil.
+
+Bunun üstesinden gelmek için, çekirdek bize `copy_from_user()` , `strncpy_from_user()` , vb. Gibi bir dizi fonksiyon ve verileri usermod a geri kopyalamak için `copy_to_user()` sürümleri sağlar. Yukarıdaki kod parçacığında, bir dizeyi yol adından `dir_name` kopyalıyoruz ve `NAME_MAX`'a kadar (Linux'ta dosya adının maksimum uzunluğu 255'tir) veya boş bayta ulaşana kadar (bu, düz eski `copy_from_user()` yerine `strncpy_from_user()` kullanmanın avantajı - boş bayt farkındadır!).
+
+Dir_name arabelleğinde depolanacak yeni klasörün adını öğrendikten sonra, onu çekirdek arabelleğine yazdırmak için her zamanki% s biçim dizesiyle printk () kullanabiliriz.
+
+Son olarak, en önemli kısım, aslında `orig_mkdir()` 'e karşılık gelen argümanlarla çağırmamızdır. Bu, `sys_mkdir`'in orijinal işlevselliğinin (yani aslında yeni bir klasör oluşturulması) korunmasını sağlar. `Orig_mkdir`'in gerçek `sys_mkdir` ile nasıl bir ilgisi olduğunu merak ediyor olabilirsiniz - tüm yaptığımız onu bir function pointer prototipi aracılığıyla tanımlamaktı. `Orig_mkdir`'i gerçek `sys_mkdir`'e bağlamak, tam olarak gelmek üzere olduğumuz fonksiyon bağlama sürecinin bir parçasıdır. Her iki durumda da `orig_mkdir`'in global olarak tanımlandığına dikkat edin. Bu, `rootkit_init` ve `rootkit_exit`'teki hooking / unhooking kodunun onu kullanmasına izin verir.
+
+Geriye kalan tek şey, bu fonksiyonu gerçek `sys_mkdir` yerine kernel'a bağlamak (Hook Etmek) tir!
 
 
 
