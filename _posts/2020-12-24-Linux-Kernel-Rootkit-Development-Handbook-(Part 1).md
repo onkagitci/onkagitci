@@ -156,12 +156,19 @@ Neyse ki bizim için Torvalds amcamızın hazırladığı harika bir potansiyel 
 İlerleyen Bölümlerde sıklıkla karşımıza çıkacak oalan bazı sistem çağrıları :
 
    *open
+   
    *read
+   
    *write
+   
    *close
+   
    *execve
+   
    *fork
+   
    *kill
+   
    *mkdir
 
 
@@ -249,7 +256,9 @@ Bu kadar temel bilgiden sorna, artık rootkitimizin yapacağı temel işlevleri 
 
 
 *syscallhooking*
+
 *function hooking*
+
 *process shellcode injection*
 
 
