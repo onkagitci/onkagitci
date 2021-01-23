@@ -254,14 +254,7 @@ Bu kadar temel bilgiden sorna, artık rootkitimizin yapacağı temel işlevleri 
 
 # II.Rootkit İşlevleri
 
-
-*syscallhooking*
-
-*function hooking*
-
-*process shellcode injection*
-
-
+Standart Bir Rootkit 'in yerie getirebilmesi gereken bazı işlevler vardır bunlardan birkaçı ; Dosyaları gizlemek , Processleri gizlemek , Bağlantı Noktaları ve Portları gizlemektir. Bir Rootkit'in bunları yapabilmesinin temel birkaç yolu var. Bunlardan 2 tanesi **Syscall Hooking** ve **Function Hooking** dir. Syscaller aynı zamanda Kernel mod olduğu için mantıken **Function Hooking** ve **Syscall Hooking** aynı anlama gelmektedir. Bir Rootkitte işlevleri yertine getirmenin en sık tercih edilen yolu **Function Hookingdir**.
 
 ### 1. Syscallhooking
 
