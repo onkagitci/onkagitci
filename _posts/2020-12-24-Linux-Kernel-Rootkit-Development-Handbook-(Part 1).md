@@ -170,6 +170,40 @@ X86_64 sistem çağrılarının tam listesini [Burada](https://github.com/torval
 Ama önce, user landdan nasıl sistem çağrısı yaptığımıza dair daha iyi bir fikre sahip olmak faydalı olacaktır - sonuçta, müdahale etmeyi istediğimiz şey bir process!
 
 
+Yukarıdaki [Sistem Çağrısı Tablosuna ](https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl) bir göz atarsanız, her sistem çağrısının kendisine atanmış bir numara olduğunu görürsünüz (bu numaralar aslında oldukça akıcıdır ve farklı mimariler ve kernel sürümleri arasında değişiklik gösterir.
+
+Bir sistem çağrısı yapmak istiyorsak, istediğimiz sistem çağrı numarasını `rax` kaydına kaydetmemiz ve ardından yazılım interrupt syscall ile Kernel 'a teslim etmemiz `(int 0x80)` gerekir. Kesmeyi kullanmadan önce sistem çağrısının belirli yazmaçlara yüklenmesi gereken argümanlar ve dönüş değeri neredeyse her zaman `rax`'a yerleştirilir.
+
+Bu, en iyi bir örnekle açıklanır - syscall 0, `sys_read`'ı inceleyelim (tüm sistem çağrılarının önünde `sys_` bulunur). Bu sisteme adam 2 okurken bakarsak, şu şekilde tanımlandığını görürüz:
+
+```ssize_t read(int fd, void *buf, size_t count);```
+
+`*fd` dosya tanımlayıcısıdır ve `open()` çağrısından döndürülür, `buf` okunan veriyi saklamak için bir arabellektir ve `count` okunacak bayt sayısıdır. Dönüş değeri, başarıyla okunan bayt sayısıdır ve hata durumunda -1 değerini alır.
+
+https://i.imgur.com/SzlZhQs.jpg
+
+
+Böylece, `rdi` file pointer 'ı, `rsi` buffer 'a bir pointer ve `rdx` okunacak bayt sayısını alır.`0x00`'ı rax'a kaydetmiş olduğumuz sürece, devam edip Kernel'a teslim edebiliriz ve sistem çağrımız gerçekleşecektir! Örnek bir NASM parçası şu lekildedir:
+
+
+```
+
+mov rax, 0x0
+mov rdi, 5
+mov rsi, buf
+mov rdx, 10
+syscall
+
+```
+
+Bu kod, `file pointer 5`'ten (rastgele seçilen) 10 bayt okur ve içerikleri buffer'a gösterilen bellek konumunda depolar. Oldukça basit, değil mi?
+
+
+Hepsi usermod için iyidir, peki ya kernel? Rootkitlerimiz çekirdek bağlamında çalışacak, bu nedenle çekirdeğin sistem çağrılarını nasıl işlediğini biraz anlamalıyız.
+
+Ne yazık ki, işlerin biraz farklı olmaya başladığı yer burası. 64 bitlik çekirdek sürümleri `4.17.0` ve üzeri, sistem çağrılarının kernel tarafından işlenme biçimi değişti. İlk olarak, eski yönteme bakacağız çünkü bu,` Ubuntu 16.04` gibi dağıtımlar için hala geçerli ve eski yöntem mantığı oturduğunda daha yeni sürümün anlaşılması çok daha kolay.
+
+
 
 
 
