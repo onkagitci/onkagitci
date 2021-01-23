@@ -145,7 +145,7 @@ hemen ardından `lsmod | grep modul` komutu ile sisteme yüklenmiş modüller i�
 gelelim silme işlemine; `sudo rmmod modul` komutu ile modülümüzü kernel dan siliyoruz..
 
 
-### II. Sistem Çağrıları
+### II. Sistem Çağrıları (Syscalls)
 
 1. Bölümde ilk kernel modülümüzü oluşturduk, ancak şimdi onun harika bir şey yapmasını istiyorsunuz - çalışan kernel 'ın davranışını değiştirmek gibi bir şey. Bunu yapmamız için gereken şey kernel mod Fonksiyonlarını hook etmektir , ancak soru şu - hangi fonksiyonları hooklayacağımızı nasıl bileceğiz?
 
@@ -254,7 +254,7 @@ Bu kadar temel bilgiden sorna, artık rootkitimizin yapacağı temel işlevleri 
 
 # II.Rootkit İşlevleri
 
-Standart Bir Rootkit 'in yerie getirebilmesi gereken bazı işlevler vardır bunlardan birkaçı ; Dosyaları gizlemek , Processleri gizlemek , Bağlantı Noktaları ve Portları gizlemektir. Bir Rootkit'in bunları yapabilmesinin temel birkaç yolu var. Bunlardan 2 tanesi **Syscall Hooking** ve **Function Hooking** dir. Syscaller aynı zamanda Kernel mod olduğu için mantıken **Function Hooking** ve **Syscall Hooking** aynı anlama gelmektedir. Bir Rootkitte işlevleri yertine getirmenin en sık tercih edilen yolu **Function Hookingdir**.
+Standart Bir Rootkit 'in yerie getirebilmesi gereken bazı işlevler vardır bunlardan birkaçı ; Dosyaları gizlemek , Processleri gizlemek , Bağlantı Noktaları ve Portları gizlemektir. Bir Rootkit'in bunları yapabilmesinin temel birkaç yolu var. Bunlardan 2 tanesi **Syscall Hooking** ve **Function Hooking** dir. Syscaller aynı zamanda Kernel modda çalışan bir ***Fonksiyon*** olduğu için teknik olarak **Function Hooking** ve **Syscall Hooking** aynı anlama gelmektedir. Bir Rootkitte işlevleri yertine getirmenin en sık tercih edilen yolu **Function Hookingdir**.
 
 ### 1. Syscallhooking
 
