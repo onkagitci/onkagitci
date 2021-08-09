@@ -1,5 +1,5 @@
 ---
-title: Klasik Linux Process Shellcode Injection
+title: Linux Process Yapısı & Process Shellcode Injection
 layout: post
 tags: [Linux,Shellcode,Injection]
 author: 0x00fy
